@@ -8,36 +8,6 @@ using namespace std;
 static map<string, midi_output_device*> output_devices;
 static map<string, midi_input_device*> input_devices;
 
-int message_array_count(midi_output_device &d) {
-    if (d.message_array_head >= d.message_array_tail)
-        return (d.message_array_tail - d.message_array_head) + 1;
-    else
-        return (d.message_array_tail - (d.message_array_head + MESSAGE_ARRAY_SIZE)) + 1;
-}
-
-bool message_array_empty(midi_output_device &d) {
-    return message_array_count(d) == 0;
-}
-
-int message_array_next_index(midi_output_device &d) {
-    return ++d.message_array_tail % MESSAGE_ARRAY_SIZE;
-}
-
-void message_array_push(midi_output_device &d, midi_message msg) {
-    d.tail_lock->lock();
-    d.message_array[message_array_next_index(d)] = msg;
-    d.tail_lock->unlock();
-}
-
-midi_message message_array_pop(midi_output_device &d) {
-    midi_message *msg = nullptr;
-    d.head_lock->lock();
-    msg = &d.message_array[d.message_array_head++];
-    d.head_lock->unlock();
-    if (msg == nullptr)
-        throw "Empty queue. Use '!message_array_empty()' first...";
-    return *msg;
-}
 
 static vector<string> get_device_list(RtMidi* t) {
     vector<string> device_list(t->getPortCount());
@@ -103,25 +73,6 @@ midi_input_device* get_midi_input_device(string device_name) {
     return input_device;
 }
 
-static void output_processor(midi_output_device *d) {
-    while (d->rt_midi_out->isPortOpen()) {
-        while (!message_array_empty(*d)) {
-            midi_message msg = message_array_pop(*d);
-
-            vector<unsigned char> rt_midi_buf(msg.size);
-            for (int i = 0; i < msg.size; i++)
-                rt_midi_buf[i] = msg.data[i];
-            d->rt_midi_out->sendMessage(&rt_midi_buf);
-        }
-    }
-}
-
-void start_output_device(midi_output_device &d) {
-    if (d.processing_thread != nullptr)
-        throw "Thread already started";
-    d.processing_thread = new thread(output_processor, &d);
-}
-
 static void basic_input_processor(midi_input_processor *p) {
     while (p->output_device != nullptr)
         if (p->loop_func != nullptr)
@@ -167,8 +118,6 @@ void destroy_midi_output_device_by_name(string name) {
 void destroy_midi_output_device(midi_output_device *d) {
     if (d->rt_midi_out->isPortOpen())
         d->rt_midi_out->closePort();
-    if (d->processing_thread->joinable())
-        d->processing_thread->join();
     output_devices.erase(d->device_name);
     delete d;
 }

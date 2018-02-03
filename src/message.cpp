@@ -1,8 +1,6 @@
 #include "message.h"
 
 
-
-
 static uint8_t most_significant_nibble(const midi_message &m) {
     return m.data[0] >> 4;
 }
@@ -32,8 +30,8 @@ midi_channel_voice_type message_channel_voice_type_of(const midi_message &m) {
     return static_cast<midi_channel_voice_type>(most_significant_nibble(m));
 }
 
-midi_channel_mode_type message_channel_mode_type_of(const midi_message &) {
-    return ALL_NOTES_OFF;
+midi_channel_mode_type message_channel_mode_type_of(const midi_message &m) {
+    return static_cast<midi_channel_mode_type>(least_significant_nibble(m));
 }
 
 midi_system_type message_system_type_of(const midi_message &m) {
