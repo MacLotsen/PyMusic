@@ -1,6 +1,6 @@
 #include <boost/python.hpp>
 #include "pymidi.h"
-#include "midi.h"
+#include "message.h"
 
 
 MidiOut::MidiOut() {
@@ -103,7 +103,7 @@ BOOST_PYTHON_MODULE (pymidi) {
 
     def("instruments", &get_instruments);
     def("instruments", &get_instruments_by_timbre);
-    def("timbres", &get_timbres);
+    def("instrument_sets", &get_timbres);
 
     class_<MidiOut>("MidiOut")
             .def("send", &MidiOut::send)

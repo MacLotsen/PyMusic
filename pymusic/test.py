@@ -1,12 +1,10 @@
-import random
-import time
-from pymusic import rhythm
-from pymusic.util import cents_of_interval
-from pymusic.interval import *
-from pymusic.modi import aeolian, locrian, lydian
-from pymusic.provider import provide
+import sys, random, time
 
 import pymidi
+from pymusic.lang import *
+from pymusic.provider import provide
+from pymusic.cli import list_selector
+from pymusic.util import cents_of_interval
 
 generalIntervalPossibilities = [
     (3, primus),
@@ -20,17 +18,32 @@ generalIntervalPossibilities = [
 ]
 
 rhythm_figures = [
-    (1, rhythm.figures[0]),
-    (1, rhythm.figures[1]),
-    (18, rhythm.figures[2])
+    (1, figures[0]),
+    (1, figures[1]),
+    (18, figures[2])
 ]
 
 m = pymidi.MidiOut()
+
+
+chosen_timbre = list_selector(pymidi.timbres(),
+                              msg="Enter index for timbre")
+
+
+def instrument_name(instr):
+    return instr[1]
+
+
+chosen_instrument = list_selector(pymidi.instruments(chosen_timbre),
+                                  msg="Enter index for instrument",
+                                  value_getter=instrument_name)
+
+# Timidity on this machine (see m.devices())
 m.select(1)
 
-m.send([0xC0, 0x41])
-m.send([0xC1, 0x00])
-m.send([0xC2, 69])
+m.send([0xC0, chosen_instrument[0]])
+# m.send([0xC1, 0x00])
+# m.send([0xC2, 69])
 
 offset = 0
 register = 0
@@ -46,7 +59,7 @@ r = None
 try:
     while True:
         rnd = random.Random(time.time())
-        n = cents_of_interval(provide(generalIntervalPossibilities, rnd), register, lydian) + (0xC * 3)
+        n = cents_of_interval(provide(generalIntervalPossibilities, rnd), lydian, register) + (0xC * 3)
         if r is None:
             r = provide(rhythm_figures, rnd)
         m.send([dev, n, 0x40])
@@ -59,7 +72,3 @@ try:
 except KeyboardInterrupt:
     print("Exit")
     sys.exit(0)
-
-# m.send([0x90, cents_of_interval(primus, locrian)+ (0xC * 2), 0x40])
-# time.sleep(1)
-# m.send([0x90, cents_of_interval(primus, locrian)+ (0xC * 2), 0x00])

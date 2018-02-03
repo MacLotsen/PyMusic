@@ -81,7 +81,7 @@ midi_note_t parseBuffer(vector<unsigned char>& msg) {
 }
 
 vector<unsigned char> toRaw(midi_note_t msg) {
-    return vector<unsigned char> { msg.action, msg.cent, msg.velocity };
+    return vector<unsigned char> {msg.action, msg.cent, static_cast<unsigned char>(msg.velocity)};
 }
 
 void inputLoop() {
@@ -104,7 +104,7 @@ void inputLoop() {
                 io_converter(stamp, in_e, out_e);
                 vector<unsigned char> out_msg = toRaw(out_e);
                 out->sendMessage(&out_msg);
-            } while (io_converter && msg_buffer.size() > 0);
+            } while (io_converter && !msg_buffer.empty());
 
             usleep(10);
         }

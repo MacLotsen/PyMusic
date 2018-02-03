@@ -14,14 +14,6 @@ typedef struct {
     int velocity;
 } midi_note_t;
 
-typedef struct {
-    
-} midi_program_t;
-
-typedef struct {
-    
-} midi_mode_t;
-
 typedef void (*io_converter_f) (double stamp, midi_note_t in, midi_note_t& out);
 
 device_map_t getInputDevices();
