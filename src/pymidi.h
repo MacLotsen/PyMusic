@@ -2,7 +2,6 @@
 #define PYMIDI_H
 
 #include <RtMidi.h>
-#include "player.h"
 
 boost::python::list get_instruments_by_timbre(std::string t);
 

@@ -39,7 +39,7 @@ chosen_instrument = list_selector(pymidi.instruments(chosen_timbre),
                                   value_getter=instrument_name)
 
 # Timidity on this machine (see m.devices())
-m.select(1)
+m.select(2)
 
 m.send([0xC0, chosen_instrument[0]])
 # m.send([0xC1, 0x00])
