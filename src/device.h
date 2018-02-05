@@ -4,7 +4,7 @@
 #include <map>
 #include <mutex>
 #include <thread>
-#include <RtMidi.h>
+#include <rtmidi/RtMidi.h>
 
 #include "./message.h"
 

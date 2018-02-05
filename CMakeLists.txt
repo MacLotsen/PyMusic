@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.0)
-project(midi)
+project(PyMusic)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lrtmidi -pthread")
+# https://www.gaia-gis.it/gaia-sins/mingw64_how_to.html#env
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lrtmidi -pthread -D_hypot=hypot")
 
 find_package(PythonInterp 3 REQUIRED)
 find_package(PythonLibs 3 REQUIRED)
 find_package(Boost REQUIRED)
-find_package(Boost COMPONENTS python-py35 REQUIRED)
+find_package(Boost COMPONENTS python3 REQUIRED)
 
 set(Boost_USE_STATIC_LIBS ON)
 
@@ -16,7 +18,7 @@ set(SOURCE_FILES src/instrument.h src/message.h src/message.cpp src/device.cpp s
 add_library(midi ${SOURCE_FILES})
 target_link_libraries(midi rtmidi)
 
-add_library(pymidi src/pymidi.cpp src/pymidi.h src/message.h)
+add_library(pymidi src/pymidi.cpp src/pymidi.h)
 target_link_libraries(pymidi ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} midi)
 
 if (UNIX)
@@ -28,3 +30,8 @@ endif ()
 
 add_executable(midi_sounds src/main.cpp)
 target_link_libraries(midi_sounds midi)
+
+install(TARGETS midi midi_sounds pymidi
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)

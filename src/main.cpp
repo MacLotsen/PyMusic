@@ -49,9 +49,9 @@ int main(int argc, char** argv) {
         } else if (begins_with("instrument ", cmd)) {
             // Set instrument for first channel (0xC0, 0xC for program change and next nibble for channel)
             index = static_cast<unsigned int>(stoi(cmd.substr(11)));
-            midi_message set_instrument_msg;
-            set_instrument_msg.size = 2;
-            set_instrument_msg.data = new uint8_t[2] {0xC0, static_cast<uint8_t>(index)};
+            midi_message set_instrument_msg { 2, new uint8_t[2] {0xC0, static_cast<uint8_t>(index)} };
+//            set_instrument_msg.size = 2;
+//            set_instrument_msg.data = ;
             //TODO make helper method
             auto raw_msg = vector<unsigned char>(2);
             for (int i = 0; i < set_instrument_msg.size; i++)
@@ -95,9 +95,9 @@ int main(int argc, char** argv) {
     turn_off_msg[0] = 0xB0;
     turn_off_msg[1] = ALL_NOTES_OFF;
 
-    output_device->rt_midi_out->sendMessage(&turn_off_msg);
-    turn_off_msg[1] = ALL_SOUNDS_OFF;
-    output_device->rt_midi_out->sendMessage(&turn_off_msg);
+//    output_device->rt_midi_out->sendMessage(&turn_off_msg);
+//    turn_off_msg[1] = ALL_SOUNDS_OFF;
+//    output_device->rt_midi_out->sendMessage(&turn_off_msg);
 
 
     // Destroy devices

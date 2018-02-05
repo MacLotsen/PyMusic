@@ -1,9 +1,10 @@
+from distutils import sysconfig
 from distutils.command.build_ext import build_ext as build_ext_orig
 import os
 import pathlib
+from distutils.sysconfig import get_python_inc
 
 from setuptools import setup, Extension
-
 
 class CMakeExtension(Extension):
 
@@ -32,6 +33,9 @@ class build_ext(build_ext_orig):
         # example of cmake args
         config = 'Debug' if self.debug else 'Release'
         cmake_args = [
+            # '-DCMAKE_CXX_COMPILER=/c/msys64/mingw64/bin/cc.exe',
+            # '-DPYTHON_INCLUDE_DIR='+get_python_inc(),
+            # '-DPYTHON_LIBRARY=' + sysconfig.get_config_var('LIBDIR'),
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + str(extdir.parent.absolute()),
             '-DCMAKE_BUILD_TYPE=' + config
         ]
@@ -45,7 +49,7 @@ class build_ext(build_ext_orig):
         os.chdir(str(build_temp))
         self.spawn(['cmake', str(cwd)] + cmake_args)
         if not self.dry_run:
-            self.spawn(['cmake', '--build', '.'] + build_args)
+            self.spawn(['cmake.exe', '--build', '.'] + build_args)
         os.chdir(str(cwd))
 
 
@@ -53,7 +57,7 @@ setup(
     name='PyMusic',
     version='0.1',
     packages={'pymusic'},
-    ext_modules=[CMakeExtension('pymusic')],
+    ext_modules=[CMakeExtension('pymidi')],
     cmdclass={
         'build_ext': build_ext,
     },
