@@ -33,9 +33,6 @@ class build_ext(build_ext_orig):
         # example of cmake args
         config = 'Debug' if self.debug else 'Release'
         cmake_args = [
-            # '-DCMAKE_CXX_COMPILER=/c/msys64/mingw64/bin/cc.exe',
-            # '-DPYTHON_INCLUDE_DIR='+get_python_inc(),
-            # '-DPYTHON_LIBRARY=' + sysconfig.get_config_var('LIBDIR'),
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + str(extdir.parent.absolute()),
             '-DCMAKE_BUILD_TYPE=' + config
         ]
@@ -49,7 +46,7 @@ class build_ext(build_ext_orig):
         os.chdir(str(build_temp))
         self.spawn(['cmake', str(cwd)] + cmake_args)
         if not self.dry_run:
-            self.spawn(['cmake.exe', '--build', '.'] + build_args)
+            self.spawn(['cmake', '--build', '.'] + build_args)
         os.chdir(str(cwd))
 
 
