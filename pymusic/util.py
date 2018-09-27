@@ -1,42 +1,26 @@
 import math
 
+from pymusic.lang.interval import Interval
 
-__CENT_OFFSET__ = 21
-
-
-def cents_of_interval(i, m, register=4):
-    cents = 0
-    for c in range(i-1):
-        cents += m[c]
-    return (__CENT_OFFSET__ + (12 * register)) + cents
+__MIDINR_OFFSET__ = 21
 
 
-def interval_of_cents(c, m):
-    normalized_cents = (c - __CENT_OFFSET__) % 12
+def midinr_of_interval(i: Interval, m: list, register=4):
+    n = __MIDINR_OFFSET__
+    for i in range(i.index-1):
+        n += m[i]
+    return (12 * register) + n
+
+
+def interval_of_mininr(n: int, m: list):
+    normalized = (n - __MIDINR_OFFSET__) % 12
     i = val = 0
-    while val < normalized_cents:
+    while val < normalized:
         val += m[i]
         i += 1
     return i + 1
 
 
-def herz_of_cents(cents, base=440.0):
-    return base * math.pow(2, cents/12)
+def hertz_of_midinr(midinr: int, base=440.0):
+    return base * math.pow(2, (midinr - 69) / 12)
 
-
-if __name__ == '__main__':
-    from pymusic.lang import *
-
-    assert(primus == 1)
-
-    # TESTING def cents_of_interval(i, m):
-    assert(cents_of_interval(secundo, ionian, 0) == 2 + __CENT_OFFSET__)
-    assert(cents_of_interval(quartus, ionian, 0) == 5 + __CENT_OFFSET__)
-
-    # TESTING def interval_of_cents(c, m):
-    assert(interval_of_cents(cents_of_interval(primus, ionian), ionian) == primus)
-    assert(interval_of_cents(cents_of_interval(secundo, ionian), ionian) == secundo)
-    assert(interval_of_cents(cents_of_interval(septimo, ionian), ionian) == septimo)
-
-    c4 = herz_of_cents(cents_of_interval(tertius, aeolian))
-    assert(round(c4, 2) == 261.63)
